@@ -15,6 +15,39 @@ const ll m = 12; // 節数
 // 基本的に 1 節あたり 3 試合開催され, 余った 2 人は抜け番(休み)となる.
 // 第 5 節のみ 2 試合開催となり抜け番が 6 人となる. 
 
+
+// 仕様する関数の説明
+
+vvll make_absent();                     // 抜け番情報の設定
+vvll initialize(vvll &absent);          // 抜け番以外の卓組を適当に初期化
+vvll matchcalc(vvll &table_state);       // tablestate から各人の対戦回数を計算
+ll violation(vvll &table_state);        // 4回以上同卓した同じ組み合わせにより生じるペナルティ値(これが0なら嬉しい)
+void check_success(vvll &table_state);  // 仕様を満たしたか(上限についてはOK)(下限は未実装)
+void print_table(vvll &table_state);    // 卓組を出力
+void print_matching(vvll &match_set); // 各人の対戦回数を出力
+vvll update(vvll &current_state);       // 現状態から良い感じに更新する
+vvll climbing(vvll &first_state);       // update を繰り返す
+
+int main(){
+    cin.tie(0);
+    ios::sync_with_stdio(false);
+
+    std::srand( time(NULL) );
+
+    vvll absent = make_absent(); // absent[i][j] : i 節目で j は抜け番.
+    vvll first_state = initialize(absent); // first_state[i][j] : i 節目で j が座っている卓.
+
+    vvll final_state = climbing(first_state); 
+    vvll final_match_set = matchcalc(final_state); // final_match_set[a][b] : a と　b の直接対決の回数.
+    
+    print_table(final_state);
+    cout << "-----------------------------" << endl;
+    print_matching(final_match_set);
+    cout << endl;
+    return 0;
+}
+
+
 // 抜け番の位置は予め決めてある.
 vvll make_absent(){
     vvll absent(m, vll(n));
@@ -69,13 +102,13 @@ vvll initialize(vvll &absent){
 }
 
 // 卓組の情報 tablestate から直接対決の回数を計算しその vector を返す.
-vvll matchcalc(vvll &tablestate){
+vvll matchcalc(vvll &table_state){
     vvll res(n, vll(n));
     REP(i, m){
         REP(a, n){
             REP(b, n){
-                if(b <= a || tablestate[i][a] == -1) continue;
-                if(tablestate[i][a] == tablestate[i][b]){
+                if(b <= a || table_state[i][a] == -1) continue;
+                if(table_state[i][a] == table_state[i][b]){
                     res[a][b]++;
                     res[b][a]++;
                 }
@@ -85,8 +118,19 @@ vvll matchcalc(vvll &tablestate){
     return res;
 }
 
+// 所望の卓組が得られたかチェック
+void check_success(vvll &table_state) {
+    if (violation(table_state)) {
+        cout << "Failed to make the table you wanted..." << endl;
+    }
+    else {
+        cout << "Succeeded in making the table you wanted!!" << endl;
+    }
+    return;
+}
+
 // 卓組の出力
-void print_state(vvll &table_state){
+void print_table(vvll &table_state){
     cout << "Which table each player is sitting at." << endl;
     cout << "    ";
     REP(i, m){
@@ -103,16 +147,18 @@ void print_state(vvll &table_state){
         }
         cout << endl;
     }
+    return;
 }
 
 // 対戦回数の出力
-void print_matching(vvll &match_count){
+void print_matching(vvll &match_set){
     REP(a, n){
         REP(b, n){
-            cout << match_count[a][b] << " ";
+            cout << match_set[a][b] << " ";
         }
         cout << endl;
     }
+    return;
 }
 
 // 同卓回数が 3 を超えた分を計算
@@ -134,9 +180,9 @@ vvll update(vvll &current_state){
     vvll curmatch = matchcalc(current_state);
     vvll next_state = current_state;
     ll provisional_violation = violation(current_state);
-    vll ma, mi; // a とマッチングしすぎている選手とあまりマッチングしていない選手の添え字集合
     vvll res;
     REP(a, n){
+        vll ma, mi; // a とマッチングしすぎている選手とあまりマッチングしていない選手の添え字集合
         REP(idx, n){
             REP(x, 6){
                 if(curmatch[a][idx] == 9 - x){
@@ -175,29 +221,10 @@ vvll update(vvll &current_state){
 // 初期状態に対して update の実行
 vvll climbing(vvll &first_state){
     vvll currentstate = first_state;
-    REP(cnt, 15){
+    REP(cnt, 20){
         currentstate = update(currentstate);
         //cout << violation(currentstate) << endl;
         if(violation(currentstate) == 0) break;
     }
     return currentstate;
-}
-
-int main(){
-    cin.tie(0);
-    ios::sync_with_stdio(false);
-
-    std::srand( time(NULL) );
-
-    vvll absent = make_absent(); // absent[j] : i 節目で j は抜け番.
-    vvll first_state = initialize(absent); // first_state[i][j] : i 節目で j が座っている卓.
-
-    vvll final_state = climbing(first_state); 
-    vvll final_match_set = matchcalc(final_state); // final_match_set[a][b] : a と　b の直接対決の回数.
-    
-    print_state(final_state);
-    cout << "-----------------------------" << endl;
-    print_matching(final_match_set);
-    cout << endl;
-    return 0;
 }

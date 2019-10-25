@@ -5,6 +5,7 @@ using namespace std;
 using ll = long long;
 using vll = vector<ll>;
 using vvll = vector<vector<ll>>;
+using P = pair<ll, ll>;
 
 // n 人参加 m 節開催の 4 人制ゲームのリーグ戦の対戦表生成ツール.
 // 同じ人と当たり過ぎないような組み合わせを出力する.
@@ -38,7 +39,7 @@ int main(){
     vvll final_state, res;
     ll penalty = 100000;
 
-    REP(i, 30){
+    REP(i, 10){
         vvll absent = make_absent(); // absent[i][j] : i 節目で j は抜け番.
         vvll first_state = initialize(absent); // first_state[i][j] : i 節目で j が座っている卓.
         final_state = climbing(first_state);
@@ -52,9 +53,8 @@ int main(){
         cout << "Failed to make table you wanted" << endl;
         cout << "The violation was:" << violation(res) << endl;
         cout << "The number of no matching:" << nomatch(res) << endl;
-        return 0;
     }
-    cout << "S U C C E S S" << endl << endl;
+    else cout << "S U C C E S S" << endl << endl;
     vvll final_match_set = matchcalc(res); // final_match_set[a][b] : a と　b の直接対決の回数.
     print_table(res);
     cout << "-----------------------------" << endl;
@@ -120,10 +120,12 @@ vvll initialize(vvll &absent) {
 // 卓組の情報 tablestate から直接対決の回数を計算しその vector を返す.
 vvll matchcalc(vvll &table_state) {
     vvll res(n, vll(n));
+    REP(i, n) res[i][i] = -1;
     REP(i, m){
         REP(a, n){
             REP(b, n){
                 if (b <= a || table_state[i][a] == -1) continue;
+                if (a == b) continue;
                 if (table_state[i][a] == table_state[i][b]) {
                     res[a][b]++;
                     res[b][a]++;
@@ -164,7 +166,7 @@ void print_table(vvll &table_state) {
 void print_matching(vvll &match_set) {
     REP(a, n){
         REP(b, n){
-            cout << match_set[a][b] << " ";
+            cout << std::setw(1) << match_set[a][b] << " ";
         }
         cout << endl;
     }
@@ -203,55 +205,44 @@ vvll update(vvll &current_state) {
     vvll curmatch = matchcalc(current_state);
     vvll next_state = current_state;
     ll provisional_violation = violation(current_state);
-    vvll res = current_state; // ここで初期化してなかったせいで何も出力されないケースがあった
     REP(a, n){
-        vll ma, mi; // a とマッチングしすぎている選手とあまりマッチングしていない選手の添え字集合
+        //vll ma, mi; // a とマッチングしすぎている選手とあまりマッチングしていない選手の添え字集合
+        vector<P> ma, mi;
         vll usma(n), usmi(n);
-        REP(x, 6){
-            REP(idx, n){
-                if (curmatch[a][idx] == 9 - x) {
-                    if (!usma[idx]) {
-                        ma.push_back(idx);
-                        usma[idx] = 1;
-                    }
-                }
+        REP(idx, n) {
+            if (idx != a) {
+                if (curmatch[a][idx] > 3) ma.push_back(P{curmatch[a][idx], idx});
+                if (curmatch[a][idx] < 3) mi.push_back(P{curmatch[a][idx], idx});
             }
         }
-        REP(x, 3){
-            REP(idx, n){
-                if (curmatch[a][idx] == x) {
-                    if (!usmi[idx]) {
-                        mi.push_back(idx);
-                        usmi[idx] = 1;
-                    }
-                }
-            }
-        }
-        for (auto p : ma) {
-            for (auto q : mi) {
+        sort(mi.begin(), mi.end());
+        sort(ma.rbegin(), ma.rend());
+        for (auto hoge : ma) {
+            for (auto huga : mi) {
                 REP(i, m){
+                    ll p = hoge.second, q = huga.second;
                     if (current_state[i][a] == -1 || current_state[i][p] == -1 || current_state[i][q] == -1) continue;
+                    // 一番ペナルティが小さくなるように更新
                     if (current_state[i][a] == current_state[i][p] && current_state[i][a] != current_state[i][q]) {
-                        next_state[i][p] = next_state[i][q];
-                        next_state[i][q] = next_state[i][p];
-                        if (violation(next_state) < provisional_violation) {
-                            provisional_violation = violation(next_state);
-                            res = next_state;
+                        // とりあえずスワップしてみてペナルティの変化を観察する
+                        swap(current_state[i][p], current_state[i][q]);
+                        if (violation(current_state) < provisional_violation) {
+                            provisional_violation = violation(current_state);
+                            next_state = current_state;
                         }
-                        next_state[i][p] = current_state[i][p];
-                        next_state[i][q] = current_state[i][q];
+                        swap(current_state[i][p], current_state[i][q]);
                     }
                 }
             }
         }
     }
-    return res;
+    return next_state;
 }
 
 // 初期状態に対して update の実行
 vvll climbing(vvll &first_state) {
     vvll currentstate = first_state;
-    REP(cnt, 20){
+    REP(cnt, 30){
         currentstate = update(currentstate);
         //cout << violation(currentstate) << endl;
         if (violation(currentstate) == 0) break;

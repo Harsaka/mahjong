@@ -16,13 +16,14 @@ const ll m = 12; // 節数
 // 第 5 節のみ 2 試合開催となり抜け番が 6 人となる. 
 
 
-// 仕様する関数の説明
+// 使用する関数の説明
 
 vvll make_absent();                     // 抜け番情報の設定
 vvll initialize(vvll &absent);          // 抜け番以外の卓組を適当に初期化
 vvll matchcalc(vvll &table_state);       // tablestate から各人の対戦回数を計算
 ll violation(vvll &table_state);        // 4回以上同卓した同じ組み合わせにより生じるペナルティ値(これが0なら嬉しい)
-void check_success(vvll &table_state);  // 仕様を満たしたか(上限についてはOK)(下限は未実装)
+ll nomatch(vvll &table_state);          // 1回も同卓しなかった組み合わせにより生じるペナルティ値(これも0なら嬉しい)
+void check_success(vvll &table_state);  // 仕様を満たしたか(下限を満たすように試みるupdateは未実装なので運依存)
 void print_table(vvll &table_state);    // 卓組を出力
 void print_matching(vvll &match_set); // 各人の対戦回数を出力
 vvll update(vvll &current_state);       // 現状態から良い感じに更新する
@@ -121,7 +122,7 @@ vvll matchcalc(vvll &table_state) {
 
 // 所望の卓組が得られたかチェック
 void check_success(vvll &table_state) {
-    if (violation(table_state)) {
+    if (violation(table_state) + nomatch(table_state)) {
         cout << "Failed to make the table you wanted..." << endl;
     }
     else {
@@ -170,6 +171,19 @@ ll violation(vvll &table_state) {
         REP(b, n){
             if (match[a][b] > 3) {
                 res += match[a][b] - 3;
+            }
+        }
+    }
+    return res;
+}
+
+ll nomatch(vvll &table_state) {
+    ll res = 0;
+    vvll match = matchcalc(table_state);
+    REP(a, n){
+        REP(b, n){
+            if (match[a][b] == 0) {
+                res ++;
             }
         }
     }

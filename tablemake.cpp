@@ -23,7 +23,7 @@ vvll initialize(vvll &absent);          // 抜け番以外の卓組を適当に�
 vvll matchcalc(vvll &table_state);       // tablestate から各人の対戦回数を計算
 ll violation(vvll &table_state);        // 4回以上同卓した同じ組み合わせにより生じるペナルティ値(これが0なら嬉しい)
 ll nomatch(vvll &table_state);          // 1回も同卓しなかった組み合わせにより生じるペナルティ値(これも0なら嬉しい)
-void check_success(vvll &table_state);  // 仕様を満たしたか(下限を満たすように試みるupdateは未実装なので運依存)
+ll check_failed(vvll &table_state);  // 仕様を満たしたか(下限を満たすように試みるupdateは未実装なので運依存)
 void print_table(vvll &table_state);    // 卓組を出力
 void print_matching(vvll &match_set); // 各人の対戦回数を出力
 vvll update(vvll &current_state);       // 現状態から良い感じに更新する
@@ -35,14 +35,28 @@ int main(){
 
     std::srand( time(NULL) );
 
-    vvll absent = make_absent(); // absent[i][j] : i 節目で j は抜け番.
-    vvll first_state = initialize(absent); // first_state[i][j] : i 節目で j が座っている卓.
+    vvll final_state, res;
+    ll penalty = 100000;
 
-    vvll final_state = climbing(first_state); 
-    vvll final_match_set = matchcalc(final_state); // final_match_set[a][b] : a と　b の直接対決の回数.
-    
-    check_success(final_state);
-    print_table(final_state);
+    REP(i, 30){
+        vvll absent = make_absent(); // absent[i][j] : i 節目で j は抜け番.
+        vvll first_state = initialize(absent); // first_state[i][j] : i 節目で j が座っている卓.
+        final_state = climbing(first_state);
+        if (check_failed(final_state) < penalty) {
+            res = final_state;
+            penalty = check_failed(res);
+        }
+        if (!check_failed(res)) break;
+    }
+    if (check_failed(res)) {
+        cout << "Failed to make table you wanted" << endl;
+        cout << "The violation was:" << violation(res) << endl;
+        cout << "The number of no matching:" << nomatch(res) << endl;
+        return 0;
+    }
+    cout << "S U C C E S S" << endl << endl;
+    vvll final_match_set = matchcalc(res); // final_match_set[a][b] : a と　b の直接対決の回数.
+    print_table(res);
     cout << "-----------------------------" << endl;
     print_matching(final_match_set);
     cout << endl;
@@ -121,14 +135,8 @@ vvll matchcalc(vvll &table_state) {
 }
 
 // 所望の卓組が得られたかチェック
-void check_success(vvll &table_state) {
-    if (violation(table_state) + nomatch(table_state)) {
-        cout << "Failed to make the table you wanted..." << endl;
-    }
-    else {
-        cout << "Succeeded in making the table you wanted!!" << endl;
-    }
-    return;
+ll check_failed(vvll &table_state) {
+    return (violation(table_state) + nomatch(table_state));
 }
 
 // 卓組の出力
@@ -183,7 +191,7 @@ ll nomatch(vvll &table_state) {
     REP(a, n){
         REP(b, n){
             if (match[a][b] == 0) {
-                res ++;
+                res++;
             }
         }
     }
@@ -195,20 +203,27 @@ vvll update(vvll &current_state) {
     vvll curmatch = matchcalc(current_state);
     vvll next_state = current_state;
     ll provisional_violation = violation(current_state);
-    vvll res;
+    vvll res = current_state; // ここで初期化してなかったせいで何も出力されないケースがあった
     REP(a, n){
         vll ma, mi; // a とマッチングしすぎている選手とあまりマッチングしていない選手の添え字集合
-        REP(idx, n){
-            REP(x, 6){
+        vll usma(n), usmi(n);
+        REP(x, 6){
+            REP(idx, n){
                 if (curmatch[a][idx] == 9 - x) {
-                    ma.push_back(idx);
+                    if (!usma[idx]) {
+                        ma.push_back(idx);
+                        usma[idx] = 1;
+                    }
                 }
             }
         }
-        REP(idx, n){
-            REP(x, 3){
+        REP(x, 3){
+            REP(idx, n){
                 if (curmatch[a][idx] == x) {
-                    mi.push_back(idx);
+                    if (!usmi[idx]) {
+                        mi.push_back(idx);
+                        usmi[idx] = 1;
+                    }
                 }
             }
         }

@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <meta charset="UTF-8">
-<html><body>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
     <script>
         // 折り畳み
         function showPlagin(idno){
@@ -34,8 +38,8 @@
         // 第 5 節のみ 2 試合開催となり抜け番が 6 人となる. 
 
     </script>
-    <h1><font color = "orange">制作中......</font></h1>
-    <h1> N 人参加の 4 人制ゲームのリーグ戦の対戦表生成ツール </h1>
+    <h1>制作中......</h1>
+    <h2> N 人参加の 4 人制ゲームのリーグ戦の対戦表生成ツール </h2>
     <h2> ①人数 N を入力して「確認」ボタンをクリックしてください。</h2>
     N:=<input style = "font-size: 28px; text-align: right;" />
     <button onclick="n_input()" style="width:105px;"> 入力確認 </button>
@@ -45,14 +49,14 @@
 
     <h2><div id = "PlagOpen1">
         <p>
-            <a href="#" onclick="showPlagin(1);return false;"><font color = "black">②必要であれば参加者の名前を入力してください:クリックで記入欄展開</font></a>
+            <a href="#" onclick="showPlagin(1);return false;">②必要であれば参加者の名前を入力してください:クリックで記入欄展開</a>
         </p>
     </div></h2>
     
     <div id="PlagClose1" style="display: none">
         <h2>
         <p>
-            <a href="#" title="非表示" onclick="showPlagin(1);return false;"><font color = "black">たたむ</font></a>
+            <a href="#" title="非表示" onclick="showPlagin(1);return false;">たたむ</a>
         </p>
         </h2>
 

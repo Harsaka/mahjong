@@ -20,6 +20,45 @@
 	            document.getElementById(po).style.display = "block";
 	        }
 	    }
+
+        const n_input = () => {
+            const t = document.getElementById("N");
+            n = t.value
+            output = "候補:";
+            if (n % 4 == 0) {
+                for (let i = 1; i < 10; i++) {
+                    output = output + i + ", ";
+                }
+            }
+            else if (n % 2 == 0) {
+                for (let i = 1; i < 10; i++) {
+                    output = output + 2 * i + ", ";
+                }
+            }
+            else {
+                for (let i = 1; i < 10; i++) {
+                    output = output + 4 * i + ", ";
+                }
+            }
+            output = output + "......";
+            document.getElementById("N_inputted-message").innerHTML = output;
+        }
+
+        const x_input = () => {
+            const t = document.getElementById("X");
+            const x = t.value
+            output = "";
+            if (n % 2 && x % 4) {
+                output = output + "不正な入力 : 一人あたりの試合数は4の倍数でなければいけません。";
+            }
+            else if (n % 2 == 0 && x % 2) {
+                output = output + "不正な入力 : 一人あたりの試合数は2の倍数でなければいけません。";
+            }
+            else {
+                output = output + "必要であれば参加者の名前を記入してください(後から表に入力することも可能です)";
+            }
+            document.getElementById("X_inputted-message").innerHTML = output;
+        }
         // functions to rewrite:
 
         // vvll make_absent();                     // 抜け番情報の設定
@@ -41,12 +80,13 @@
     <h1>制作中......</h1>
     <h2> N 人参加の 4 人制ゲームのリーグ戦の対戦表生成ツール </h2>
     <h2> ①人数 N を入力して「確認」ボタンをクリックしてください。</h2>
-    N:=<input style = "font-size: 28px; text-align: right;" />
+    N:=<input type = "number" style = "font-size: 28px; text-align: right;" id = "N" />
     <button onclick="n_input()" style="width:105px;"> 入力確認 </button>
-    <h2> ②節数 M を以下の候補から選んで入力してください。</h2>　
-    候補:<br />
-    M:=<input style = "font-size: 28px; text-align: right;" /><br />
-
+    <h2> ②一人あたりの試合数 X を以下の候補から選んで入力してください。</h2>　
+    <p id="N_inputted-message"></p>
+    X:=<input type = "number" style = "font-size: 28px; text-align: right;" id = "X" /><br />
+    <button onclick="x_input()" style="width:105px;"> 入力確認 </button>
+    <p id="X_inputted-message"></p>
     <h2><div id = "PlagOpen1">
         <p>
             <a href="#" onclick="showPlagin(1);return false;">②必要であれば参加者の名前を入力してください:クリックで記入欄展開</a>

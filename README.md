@@ -2,7 +2,7 @@
 
 tablemake.cpp : 自分用．機能は果たしているものの出力の可読性が低すぎる．実行環境によるが，メモリがそこそこ厳しそう．
 
-tablemake.html : 視覚的に使い物になるものを作成中．
+tablemake.html : 視覚的に使い物になるものを作成中．←何でhtmlでやろうとしてたん？
 
 ## 概要
 
@@ -33,7 +33,7 @@ tablemake.html : 視覚的に使い物になるものを作成中．
 
 ## 計算量
 
-$n$ = 14(参加人数)
+$n$ = 14(参加人数) \\
 $m$ = 12(節数)
 
 - violation() : $O(m * n^2)$
@@ -48,7 +48,7 @@ $m$ = 12(節数)
     - 全体で$O(T * m^2 * n^4)$ 
 
 - simulated_annealing() : $O(K * R * m^2 * n^4)$
-    - 焼きなまし法における温度更新回数 $K$ は、初期温度 (INITIAL_TEMPERATURE) と冷却率 $r$;(COOLING_RATE) に依存する。
+    - 焼きなまし法における温度更新回数 $K$ は、初期温度 INITIAL_TEMPERATURE と冷却率 $r$;COOLING_RATE に依存する。
     - 温度が $1$ 以下になるまでの更新回数を $K$ とすると、以下のように計算される：
         $K = \\left\\lceil \\log_{r} \\left( \\frac{1}{\\text{INITIAL\\_TEMPERATURE}} \\right) \\right\\rceil$
     - $R$ は各ステップでの update() の試行回数

@@ -21,12 +21,20 @@ tablemake.html : 視覚的に使い物になるものを作成中．
 
 - update(state) : 当たりすぎているところをあまり当たっていないところと入れ替える.
 
-- climbing(first_state) : 初期状態 first_state から始めて, violation() が 0 になるか時間的な都合で打ち切るまで update() を繰り返す.
+- simulated_annealing(initial_state) : 初期状態 initial_state からスタートし、焼きなまし法を用いて最適な組み合わせを探索する.
+    - 初期温度を設定し、温度が$1$を超える間下記を繰り返す
+        - update() で入れ替え候補の状態を生成し、入れ替え前の状態とペナルティ値 violation() を比較する
+        - ペナルティが改善される場合、または確率的に悪化を許容する条件（焼きなまし法の確率ルール）を満たす場合に candidate_state を採用※
+        - ペナルティの暫定最小値を達成した状態を best_state に記録
+        - 温度を冷却率 $r$ に従って冷却
+    - best state を返す
+
+※焼きなまし法は、局所最適解を避けるため、確率的にペナルティが悪化する変更も許容する
 
 ## 計算量
 
-n == 14(参加人数)
-m == 12(節数)
+$n$ = 14(参加人数)
+$m$ = 12(節数)
 
 - violation() : $O(m * n^2)$
     - 全ての節(m)について、全てのプレイヤーのペア(n^2)を調べる
@@ -40,7 +48,7 @@ m == 12(節数)
     - 全体で$O(T * m^2 * n^4)$ 
 
 - simulated_annealing() : $O(K * R * m^2 * n^4)$
-    - 焼きなまし法における温度更新回数 $K$ は、初期温度 (INITIAL_TEMPERATURE) と冷却率 (COOLING_RATE) に依存する。
+    - 焼きなまし法における温度更新回数 $K$ は、初期温度 (INITIAL_TEMPERATURE) と冷却率 $r$;(COOLING_RATE) に依存する。
     - 温度が $1$ 以下になるまでの更新回数を $K$ とすると、以下のように計算される：
         $K = \\left\\lceil \\log_{r} \\left( \\frac{1}{\\text{INITIAL\\_TEMPERATURE}} \\right) \\right\\rceil$
     - $R$ は各ステップでの update() の試行回数

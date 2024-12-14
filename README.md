@@ -28,20 +28,24 @@ tablemake.html : 視覚的に使い物になるものを作成中．
 n == 14(参加人数)
 m == 12(節数)
 
-- violation() : O(n^2)
+- violation() : $O(m * n^2)$
+    - 全ての節(m)について、全てのプレイヤーのペア(n^2)を調べる
 
-- update() : O(n^3 * m * O(violation()))
+- update() : $O(m^2 * n^4)$
+    - 1回の violation() 呼び出しに $O(m * n^2)$
+    - 各スワップごとに violation() を呼び出してペナルティを計算
 
-- climbing() : O(T * update()) // Tは自分で決めた update() の実行回数.
+- climbing() : $O(T * update())$
+    - $T$は自分で決めた update() の実行回数.
+    - 全体で$O(T * m^2 * n^4)$ 
 
-- 全体でO(T * n^5 * m) // 今 T = 12でやってても中々渋い時間が掛かる. 最適解に辿り着かないこともある.
+- simulated_annealing() : $O(K * R * m^2 * n^4)$
+    - 焼きなまし法における温度更新回数 $K$ は、初期温度 (INITIAL_TEMPERATURE) と冷却率 (COOLING_RATE) に依存する。
+    - 温度が $1$ 以下になるまでの更新回数を $K$ とすると、以下のように計算される：
+        $K = \\left\\lceil \\log_{r} \\left( \\frac{1}{\\text{INITIAL\\_TEMPERATURE}} \\right) \\right\\rceil$
+    - $R$ は各ステップでの update() の試行回数
+    - 現在は $R = 10$ で設定
 
 ## 改善点
-
-- 時間的には余裕があるハズだけど結構な割合でｾｸﾞﾌｫる. どうして...
-
-- もう少し見やすく書く.
-
-- 計算量改善(分からない). update() 内部の violation() 計算で全部を見る必要がないため，そこで落とせる雰囲気はある.
-
-- n について一般化.
+- アウトプットの UI を考える
+- $m$, $n$ について一般化

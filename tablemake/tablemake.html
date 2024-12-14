@@ -25,22 +25,26 @@
             const t = document.getElementById("N");
             n = t.value
             output = "候補:";
+            tale = "";
             if (n % 4 == 0) {
                 for (let i = 1; i < 10; i++) {
-                    output = output + i + ", ";
+                    output += i + ", ";
                 }
+                tale += ":整数";
             }
             else if (n % 2 == 0) {
                 for (let i = 1; i < 10; i++) {
                     output = output + 2 * i + ", ";
                 }
+                tale = ":2の倍数";
             }
             else {
                 for (let i = 1; i < 10; i++) {
                     output = output + 4 * i + ", ";
                 }
+                tale = ":4の倍数";
             }
-            output = output + "......";
+            output += "......" + tale;
             document.getElementById("N_inputted-message").innerHTML = output;
         }
 
@@ -84,7 +88,7 @@
     <button onclick="n_input()" style="width:105px;"> 入力確認 </button>
     <h2> ②一人あたりの試合数 X を以下の候補から選んで入力してください。</h2>　
     <p id="N_inputted-message"></p>
-    X:=<input type = "number" style = "font-size: 28px; text-align: right;" id = "X" /><br />
+    X:=<input type = "number" style = "font-size: 28px; text-align: right;" id = "X" />
     <button onclick="x_input()" style="width:105px;"> 入力確認 </button>
     <p id="X_inputted-message"></p>
     <h2><div id = "PlagOpen1">

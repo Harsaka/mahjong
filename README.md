@@ -45,7 +45,7 @@ $m$ = 12(節数)
 
 - climbing() : $O(T * update())$
     - $T$は自分で決めた update() の実行回数.
-    - 全体で$O(T * m^2 * n^4)$ 
+    - 全体で $O(T * m^2 * n^4)$ 
 
 - simulated_annealing() : $O(K * R * m^2 * n^4)$
     - 焼きなまし法における温度更新回数 $K$ は、初期温度 INITIAL_TEMPERATURE と冷却率 $r$;COOLING_RATE に依存する。
